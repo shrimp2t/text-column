@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <title>Convert Text to Nice Columns</title>
+    <style type="text/css">
+        body {
+            display: block;
+        }
+
+        .col {
+            width: 48%;
+            float: left;
+            display: block;
+            margin-right: 1%;
+        }
+
+        textarea {
+            width: 100%;
+            height: 350px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="col">
+        <textarea id="input"></textarea>
+    </div>
+    <div class="col">
+        <textarea id="output"></textarea>
+    </div>
+
+    <script type="text/javascript">
+        var convertColumn = function () {
+            var bridge = function (text) {
+                var options = {
+                    'input-element-separator': ' ',
+                    'input-row-separator': "\n",
+                    'output-element-separator': ' ',
+                    'output-row-separator': "\n",
+                };
+
+                if (text.length == 0) {
+                    return "";
+                }
+
+                var inputElSep = options["input-element-separator"] || "";
+                var inputRowSep = options["input-row-separator"] || "\n";
+                var outputElSep = options["output-element-separator"] || "";
+                var outputRowSep = options["output-row-separator"] || "\n";
+
+                if (inputElSep == "\\n") inputElSep = "\n";
+                if (outputElSep == "\\n") outputElSep = "\n";
+                if (inputRowSep == "\\n") inputRowSep = "\n";
+                if (outputRowSep == "\\n") outputRowSep = "\n";
+                if (inputElSep == " ") inputElSep = /\s+/;
+
+                var align = "left";
+
+                var sepPos = {
+                    sepByColumns: options["align-separator-by-columns"],
+                    sepEverywhere: options["separator-everywhere"]
+                }
+
+                var lines = text.split(inputRowSep);
+                var rows = [];
+                var maxColLen = 0;
+                var columnsLen = [];
+                var maxColumn = 0;
+
+
+                for (var i = 0; i < lines.length; i++) {
+                    var columns = lines[i].trim().split(inputElSep);
+                    if (maxColumn < columns.length) {
+                        maxColumn = columns.length;
+                    }
+
+                    rows.push(columns);
+                    // Tim do rong lon nhat cuar cot.
+                    for (var k = 0; k < columns.length; k++) {
+                        if (typeof columnsLen[k] === "undefined") {
+                            columnsLen[k] = 0;
+                        }
+                        var l = columns[k].length;
+                        if (maxColLen < l) {
+                            maxColLen = l;
+                        }
+                        if (columnsLen[k] < l) {
+                            columnsLen[k] = l;
+                        }
+                    }
+
+                }
+
+                var tab = '    '; // 4 spaces.
+                var formatText = '';
+                var headingColum = rows[0];
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var rowTxt = '';
+                    for (var j = 0; j < maxColumn; j++) {
+                        var colMaxLen = columnsLen[j];
+                        var value = '';
+                        if (typeof row[j] !== "undefined") {
+                            value = row[j];
+                        }
+                        var vl = value.length;
+
+                        if (j > 0 && typeof headingColum[j] === "undefined") {
+                            rowTxt = rowTxt.trim() + ' ' + value.trim();
+                        } else {
+                            if (vl < colMaxLen) {
+                                value += repeatString(' ', colMaxLen - vl);
+                            }
+                            rowTxt += tab + value;
+                        }
+
+                    }
+                    formatText += rowTxt.trim() + "\n";
+                }
+
+                return formatText;
+            }
+
+
+            function repeatString(str, count) {
+                if (count == 0) return "";
+                if (count == 1) return str;
+                var ret = "";
+                for (var i = 0; i < count; i++) {
+                    ret = ret + str;
+                }
+                return ret;
+            }
+
+
+            return {
+                converter: bridge,
+                config: {}
+            }
+
+        }
+
+        var f = convertColumn();
+        var input = document.getElementById('input');
+        var output = document.getElementById('output');
+        input.addEventListener("click", function () {
+            var text = input.value;
+            var r = f.converter(text);
+            output.value = r;
+        });
+        input.addEventListener("onpaste", function () {
+            var text = input.value;
+            var r = f.converter(text);
+            output.value = r;
+        });
+
+
+
+    </script>
+</body>
+
+</html>
