@@ -149,12 +149,12 @@
         var output = document.getElementById('output');
         input.addEventListener("click", function () {
             var text = input.value;
-            var r = f.converter(text);
+            var r = f.converter(text.trim());
             output.value = r;
         });
         input.addEventListener("onpaste", function () {
             var text = input.value;
-            var r = f.converter(text);
+            var r = f.converter(text.trim());
             output.value = r;
         });
 
