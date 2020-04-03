@@ -6,32 +6,46 @@
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <title>Convert Text to Nice Columns</title>
     <style type="text/css">
+    * {
+        box-sizing: border-box;
+    }
         body {
             display: block;
             font-size: 14px;
         }
 
         .col {
-            width: 48%;
-            float: left;
+            width: 49%;
             display: block;
-            margin-right: 1%;
         }
-
+        .right {
+            float: right;
+        }
+        .left {
+            float: left;
+        }
         textarea {
             width: 100%;
             height: 350px;
+            border: 3px solid #444444;
+            padding: 15px;
+            height: 90vh;
+            display: block;
+        }
+        #output {
+            border-color: #1e88e5;
+            background-color: #e3f2fd;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="col">
+    <div class="col left">
         <textarea id="input"></textarea>
     </div>
-    <div class="col">
-        <textarea id="output"></textarea>
+    <div class="col right">
+        <textarea id="output" readonly></textarea>
     </div>
 
     <script type="text/javascript">
@@ -57,7 +71,8 @@
                 if (outputElSep == "\\n") outputElSep = "\n";
                 if (inputRowSep == "\\n") inputRowSep = "\n";
                 if (outputRowSep == "\\n") outputRowSep = "\n";
-                if (inputElSep == " ") inputElSep = /\s+/;
+                //inputElSep = /\w+|"(?:\\"|[^"])+"/g;
+                inputElSep = /[^\s"']+|"([^"]*)"/gmi;
 
                 var align = "left";
 
@@ -74,7 +89,8 @@
 
 
                 for (var i = 0; i < lines.length; i++) {
-                    var columns = lines[i].trim().split(inputElSep);
+                    var columns = lines[i].trim().match(inputElSep);
+                    console.log( 'columns', columns );
                     if (maxColumn < columns.length) {
                         maxColumn = columns.length;
                     }
@@ -149,6 +165,11 @@
         var input = document.getElementById('input');
         var output = document.getElementById('output');
         input.addEventListener("change", function () {
+            var text = input.value;
+            var r = f.converter(text.trim());
+            output.value = r;
+        });
+        input.addEventListener("blur", function () {
             var text = input.value;
             var r = f.converter(text.trim());
             output.value = r;
