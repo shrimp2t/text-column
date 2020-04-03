@@ -147,7 +147,7 @@
         var f = convertColumn();
         var input = document.getElementById('input');
         var output = document.getElementById('output');
-        input.addEventListener("click", function () {
+        input.addEventListener("change", function () {
             var text = input.value;
             var r = f.converter(text.trim());
             output.value = r;
